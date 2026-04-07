@@ -32,6 +32,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.runtime.rememberCoroutineScope
 import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.core.PickerType
@@ -55,10 +57,14 @@ fun SubjectDetailScreen(
     val readingTimes = remember { mutableStateMapOf<String, Long>() } // accumulated seconds per PDF
     val awardedMinutes = remember { mutableStateMapOf<String, Long>() } // already-awarded minutes per PDF
     var selectedPdfToView by remember { mutableStateOf<String?>(null) }
+    // selected flashcard to view (shows generated flashcards for a PDF)
+    var selectedFlashcardToView by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
 
     // Flashcard states: mapping from PDF name to whether flashcards exist
     val flashcardsExist = remember { mutableStateMapOf<String, Boolean>() }
+    // Hover state per PDF flashcard tile
+    val flashcardHover = remember { mutableStateMapOf<String, Boolean>() }
     // State to show loading overlay during flashcard generation
     var generatingFlashcardFor by remember { mutableStateOf<String?>(null) }
     var loadingMessage by remember { mutableStateOf("") }
@@ -187,10 +193,27 @@ fun SubjectDetailScreen(
 
             // Show flash card tile if it exists for this PDF
             if (flashcardsExist[pdfName] == true) {
+                // make the flashcard tile clickable to open the flashcard dialog
+                val hovered = flashcardHover[pdfName] ?: false
                 Card(
-                    modifier = Modifier.fillMaxWidth().padding(start = 24.dp, top = 4.dp, bottom = 8.dp),
+                    onClick = { selectedFlashcardToView = pdfName },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 24.dp, top = 4.dp, bottom = 8.dp)
+                        .pointerInput(Unit) {
+                            awaitPointerEventScope {
+                                while (true) {
+                                    val ev = awaitPointerEvent()
+                                    when (ev.type) {
+                                        PointerEventType.Enter -> flashcardHover[pdfName] = true
+                                        PointerEventType.Exit -> flashcardHover[pdfName] = false
+                                        else -> {}
+                                    }
+                                }
+                            }
+                        },
                     colors = androidx.compose.material3.CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer
+                        containerColor = if (hovered) MaterialTheme.colorScheme.primary.copy(alpha = 0.12f) else MaterialTheme.colorScheme.secondaryContainer
                     )
                 ) {
                     Row(
@@ -244,6 +267,31 @@ fun SubjectDetailScreen(
                 }
             },
         )
+    }
+
+    // Flashcard viewer dialog (shows generated flashcards for a PDF)
+    if (selectedFlashcardToView != null) {
+        Dialog(onDismissRequest = { selectedFlashcardToView = null }) {
+            Card(
+                modifier = Modifier.padding(16.dp),
+                shape = MaterialTheme.shapes.medium
+            ) {
+                Column(
+                    modifier = Modifier.padding(24.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Text("Flash Cards: ${selectedFlashcardToView}", style = MaterialTheme.typography.titleLarge)
+                    Text(
+                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(onClick = { selectedFlashcardToView = null }, modifier = Modifier.fillMaxWidth()) {
+                        Text("Close")
+                    }
+                }
+            }
+        }
     }
 
     // Loading overlay for flashcard generation
