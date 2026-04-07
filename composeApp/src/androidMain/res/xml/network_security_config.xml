@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Development config: permit cleartext for all domains. Replace with stricter rules for production. -->
+    <base-config cleartextTrafficPermitted="true" />
+    <!-- Example: to restrict cleartext to specific domain only, replace with:
+         <domain-config cleartextTrafficPermitted="true">
+             <domain includeSubdomains="true">example.com</domain>
+         </domain-config>
+    -->
+</network-security-config>
+
