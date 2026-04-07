@@ -36,6 +36,7 @@ fun LandingScreen(
 ) {
     var visible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { visible = true }
+    val s = LocalStrings.current
 
     Column(
         modifier = Modifier
@@ -49,7 +50,7 @@ fun LandingScreen(
             enter = fadeIn(tween(600)) + slideInVertically(tween(600)) { -20 }
         ) {
             Text(
-                text = "Hi ${profile.name}",
+                text = "${s.hi} ${profile.name}",
                 style = MaterialTheme.typography.headlineMedium,
             )
         }
@@ -64,8 +65,8 @@ fun LandingScreen(
             ) {
                 Card(modifier = Modifier.weight(1f)) {
                     Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Text("Streak", style = MaterialTheme.typography.titleMedium)
-                        Text("${profile.streakDays} days", style = MaterialTheme.typography.bodyLarge)
+                        Text(s.streak, style = MaterialTheme.typography.titleMedium)
+                        Text("${profile.streakDays} ${s.days}", style = MaterialTheme.typography.bodyLarge)
                     }
                 }
                 Card(modifier = Modifier.weight(1f)) {
@@ -82,7 +83,7 @@ fun LandingScreen(
             enter = fadeIn(tween(600, 200))
         ) {
             Text(
-                text = "Daily quests",
+                text = s.dailyQuests,
                 style = MaterialTheme.typography.titleLarge,
             )
         }
@@ -114,14 +115,14 @@ fun LandingScreen(
                     onClick = onOpenProfile,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text("My profile")
+                    Text(s.myProfile)
                 }
 
                 OutlinedButton(
                     onClick = onOpenSubjects,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text("Uni subjects")
+                    Text(s.uniSubjects)
                 }
             }
         }

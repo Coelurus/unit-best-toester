@@ -43,6 +43,7 @@ fun ProfileScreen(
     var visible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { visible = true }
     val scope = rememberCoroutineScope()
+    val s = LocalStrings.current
 
     // Editable fields
     var nickname by remember { mutableStateOf(profile.nickname) }
@@ -105,7 +106,7 @@ fun ProfileScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Profile") },
+                title = { Text(s.profile) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Text("<")
@@ -167,7 +168,7 @@ fun ProfileScreen(
                         }
                     }
                 }) {
-                    Text(if (avatarBitmap != null) "Change photo" else "Upload photo")
+                    Text(if (avatarBitmap != null) s.changePhoto else s.uploadPhoto)
                 }
 
                 Text(profile.name, style = MaterialTheme.typography.headlineSmall)
@@ -181,7 +182,7 @@ fun ProfileScreen(
             HorizontalDivider()
 
             // ── Level / XP / Streak ────────────────────────
-            Text("Stats", style = MaterialTheme.typography.titleLarge)
+            Text(s.stats, style = MaterialTheme.typography.titleLarge)
 
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -189,7 +190,7 @@ fun ProfileScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
-                        Text("Level", style = MaterialTheme.typography.titleMedium)
+                        Text(s.level, style = MaterialTheme.typography.titleMedium)
                         Text("$level", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                     }
 
@@ -199,7 +200,7 @@ fun ProfileScreen(
                     )
 
                     Text(
-                        "$xpInLevel / $XP_PER_LEVEL XP  •  $xpToNext XP to Level ${level + 1}",
+                        "$xpInLevel / $XP_PER_LEVEL XP  •  $xpToNext ${s.xpToLevel} ${level + 1}",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -208,7 +209,7 @@ fun ProfileScreen(
 
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                         Column {
-                            Text("Total XP", style = MaterialTheme.typography.bodySmall)
+                            Text(s.totalXp, style = MaterialTheme.typography.bodySmall)
                             Text(
                                 "${profile.xp}",
                                 style = MaterialTheme.typography.titleMedium,
@@ -216,9 +217,9 @@ fun ProfileScreen(
                             )
                         }
                         Column(horizontalAlignment = Alignment.End) {
-                            Text("Streak", style = MaterialTheme.typography.bodySmall)
+                            Text(s.streak, style = MaterialTheme.typography.bodySmall)
                             Text(
-                                "🔥 ${profile.streakDays} days",
+                                "🔥 ${profile.streakDays} ${s.days}",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                             )
@@ -229,7 +230,7 @@ fun ProfileScreen(
 
             // ── XP History Graph ─────────────────────────
             if (xpHistory.isNotEmpty()) {
-                Text("XP Progress (last 14 days)", style = MaterialTheme.typography.titleLarge)
+                Text(s.xpProgressTitle, style = MaterialTheme.typography.titleLarge)
                 XpLineChart(
                     entries = xpHistory,
                     modifier = Modifier
@@ -241,12 +242,12 @@ fun ProfileScreen(
             HorizontalDivider()
 
             // ── Edit Profile ───────────────────────────────
-            Text("Edit Profile", style = MaterialTheme.typography.titleLarge)
+            Text(s.editProfile, style = MaterialTheme.typography.titleLarge)
 
             OutlinedTextField(
                 value = nickname,
                 onValueChange = { nickname = it },
-                label = { Text("Nickname") },
+                label = { Text(s.nickname) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -274,13 +275,13 @@ fun ProfileScreen(
                     CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
                     Spacer(Modifier.width(8.dp))
                 }
-                Text("Save changes")
+                Text(s.saveChanges)
             }
 
             HorizontalDivider()
 
             // ── Leaderboard ──────────────────────────────
-            Text("Leaderboard", style = MaterialTheme.typography.titleLarge)
+            Text(s.leaderboard, style = MaterialTheme.typography.titleLarge)
 
             // Toggle: Total XP vs Weekly XP
             var showWeekly by remember { mutableStateOf(false) }
@@ -292,12 +293,12 @@ fun ProfileScreen(
                 FilterChip(
                     selected = !showWeekly,
                     onClick = { showWeekly = false },
-                    label = { Text("Total XP") },
+                    label = { Text(s.totalXp) },
                 )
                 FilterChip(
                     selected = showWeekly,
                     onClick = { showWeekly = true },
-                    label = { Text("This week") },
+                    label = { Text(s.thisWeek) },
                 )
             }
 
@@ -311,7 +312,7 @@ fun ProfileScreen(
                 }
 
                 if (sorted.isEmpty()) {
-                    Text("No friends yet – send a request below!", style = MaterialTheme.typography.bodyMedium)
+                    Text(s.noFriends, style = MaterialTheme.typography.bodyMedium)
                 }
 
                 sorted.forEachIndexed { index, friend ->
@@ -375,7 +376,7 @@ fun ProfileScreen(
                                     )
                                     if (friend.isYou) {
                                         Text(
-                                            "(you)",
+                                            s.you,
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.primary,
                                         )
@@ -398,7 +399,7 @@ fun ProfileScreen(
                                     else MaterialTheme.colorScheme.onSurface,
                                 )
                                 Text(
-                                    if (showWeekly) "this week" else "total XP",
+                                    if (showWeekly) s.thisWeekLabel else s.totalXpLabel,
                                     style = MaterialTheme.typography.labelSmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
@@ -410,7 +411,7 @@ fun ProfileScreen(
                 Spacer(Modifier.height(4.dp))
 
                 // Send friend request
-                Text("Add a friend", style = MaterialTheme.typography.titleMedium)
+                Text(s.addFriend, style = MaterialTheme.typography.titleMedium)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -419,7 +420,7 @@ fun ProfileScreen(
                     OutlinedTextField(
                         value = newFriendId,
                         onValueChange = { newFriendId = it },
-                        label = { Text("User ID") },
+                        label = { Text(s.userId) },
                         singleLine = true,
                         modifier = Modifier.weight(1f),
                     )
@@ -437,14 +438,14 @@ fun ProfileScreen(
                         },
                         enabled = newFriendId.isNotBlank(),
                     ) {
-                        Text("Send")
+                        Text(s.send)
                     }
                 }
 
                 // Outgoing pending requests
                 if (outgoingRequests.isNotEmpty()) {
                     Spacer(Modifier.height(8.dp))
-                    Text("Sent requests", style = MaterialTheme.typography.titleMedium)
+                    Text(s.sentRequests, style = MaterialTheme.typography.titleMedium)
                     outgoingRequests.forEach { req ->
                         Card(modifier = Modifier.fillMaxWidth()) {
                             Row(
@@ -453,7 +454,7 @@ fun ProfileScreen(
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 Text("→ ${req.toUserName} (${req.toUserId})")
-                                Text("pending", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(s.pending, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                         }
                     }
@@ -462,7 +463,7 @@ fun ProfileScreen(
                 // Incoming requests
                 if (incomingRequests.isNotEmpty()) {
                     Spacer(Modifier.height(8.dp))
-                    Text("Incoming requests", style = MaterialTheme.typography.titleMedium)
+                    Text(s.incomingRequests, style = MaterialTheme.typography.titleMedium)
                     incomingRequests.forEach { req ->
                         Card(modifier = Modifier.fillMaxWidth()) {
                             Row(
@@ -479,7 +480,7 @@ fun ProfileScreen(
                                                 loadFriends()
                                             } catch (_: Exception) { /* ignore */ }
                                         }
-                                    }) { Text("Accept") }
+                                    }) { Text(s.accept) }
                                     OutlinedButton(onClick = {
                                         scope.launch {
                                             try {
@@ -487,7 +488,7 @@ fun ProfileScreen(
                                                 loadFriends()
                                             } catch (_: Exception) { /* ignore */ }
                                         }
-                                    }) { Text("Decline") }
+                                    }) { Text(s.decline) }
                                 }
                             }
                         }

@@ -5,6 +5,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
@@ -75,6 +76,10 @@ fun App() {
     var isDarkMode by remember { mutableStateOf(systemDark) }
     val toggleDarkMode = { isDarkMode = !isDarkMode }
 
+    var language by remember { mutableStateOf(AppLanguage.EN) }
+    val toggleLanguage = { language = if (language == AppLanguage.EN) AppLanguage.CS else AppLanguage.EN }
+    val strings = if (language == AppLanguage.CS) CsStrings else EnStrings
+
     val toesterDark = darkColorScheme(
         primary = Color(0xFFBB86FC),
         onPrimary = Color(0xFF000000),
@@ -102,6 +107,9 @@ fun App() {
     CompositionLocalProvider(
         LocalIsDarkMode provides isDarkMode,
         LocalToggleDarkMode provides toggleDarkMode,
+        LocalLanguage provides language,
+        LocalToggleLanguage provides toggleLanguage,
+        LocalStrings provides strings,
     ) {
         MaterialTheme(colorScheme = colorScheme) {
             Surface(
@@ -214,12 +222,16 @@ fun App() {
             }
         }
 
-                // Floating dark-mode toggle – visible on every screen
-                ThemeToggleButton(
+                // Floating controls – visible on every screen
+                Row(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
                         .padding(16.dp),
-                )
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    LanguageToggleButton()
+                    ThemeToggleButton()
+                }
                 }
             }
         }

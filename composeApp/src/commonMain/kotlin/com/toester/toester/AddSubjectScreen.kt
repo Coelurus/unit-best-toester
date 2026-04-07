@@ -20,11 +20,12 @@ fun AddSubjectScreen(
     var id by remember { mutableStateOf("") }
     var visible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { visible = true }
+    val s = LocalStrings.current
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Add New Subject") },
+                title = { Text(s.addNewSubject) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Text("<") // Simplified back button to avoid unresolved icons dependency
@@ -47,21 +48,21 @@ fun AddSubjectScreen(
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text("Subject Name") },
+                    label = { Text(s.subjectName) },
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 OutlinedTextField(
                     value = teacher,
                     onValueChange = { teacher = it },
-                    label = { Text("Teacher") },
+                    label = { Text(s.teacherLabel) },
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 OutlinedTextField(
                     value = id,
                     onValueChange = { id = it },
-                    label = { Text("Subject ID (e.g. math101)") },
+                    label = { Text(s.subjectId) },
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -83,7 +84,7 @@ fun AddSubjectScreen(
                     modifier = Modifier.fillMaxWidth(),
                     enabled = name.isNotBlank() && teacher.isNotBlank() && id.isNotBlank()
                 ) {
-                    Text("Save Subject")
+                    Text(s.saveSubject)
                 }
             }
         }

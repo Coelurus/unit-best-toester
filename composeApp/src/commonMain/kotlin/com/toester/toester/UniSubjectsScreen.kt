@@ -35,6 +35,7 @@ fun UniSubjectsScreen(
 ) {
     var visible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { visible = true }
+    val s = LocalStrings.current
 
     Column(
         modifier = Modifier
@@ -47,7 +48,7 @@ fun UniSubjectsScreen(
             visible = visible,
             enter = fadeIn(tween(500))
         ) {
-            Text("Uni subjects", style = MaterialTheme.typography.headlineMedium)
+            Text(s.uniSubjects, style = MaterialTheme.typography.headlineMedium)
         }
 
         subjects.forEachIndexed { index, subject ->
@@ -64,10 +65,10 @@ fun UniSubjectsScreen(
                     ) {
                         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             Text(subject.name, style = MaterialTheme.typography.titleMedium)
-                            Text("Teacher: ${subject.teacher}")
+                            Text("${s.teacher}: ${subject.teacher}")
                         }
                         OutlinedButton(onClick = { onOpenSubject(subject) }) {
-                            Text("Open")
+                            Text(s.open)
                         }
                     }
                 }
@@ -80,11 +81,11 @@ fun UniSubjectsScreen(
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Button(onClick = onAddSubject, modifier = Modifier.fillMaxWidth()) {
-                    Text("Add Subject")
+                    Text(s.addSubject)
                 }
 
                 OutlinedButton(onClick = onBack, modifier = Modifier.fillMaxWidth()) {
-                    Text("Back to landing")
+                    Text(s.backToLanding)
                 }
             }
         }

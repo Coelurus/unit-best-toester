@@ -43,6 +43,7 @@ fun SubjectDetailScreen(
 ) {
     var visible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { visible = true }
+    val s = LocalStrings.current
 
     val pdfs = remember { mutableStateListOf<String>().apply { addAll(subject.pdfs) } }
     val pdfData = remember { mutableStateMapOf<String, ByteArray>().apply { putAll(subject.pdfData) } }
@@ -74,13 +75,13 @@ fun SubjectDetailScreen(
         AnimatedVisibility(visible = visible, enter = fadeIn()) {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text(subject.name, style = MaterialTheme.typography.headlineMedium)
-                Text("Teacher: ${subject.teacher}")
+                Text("${s.teacher}: ${subject.teacher}")
                 HorizontalDivider()
             }
         }
 
         AnimatedVisibility(visible = visible, enter = fadeIn(tween(delayMillis = 200))) {
-            Text("Subject quests", style = MaterialTheme.typography.titleLarge)
+            Text(s.subjectQuests, style = MaterialTheme.typography.titleLarge)
         }
 
         val subjectQuests = dailyQuests.filter { it.subjectId == subject.id }
@@ -112,7 +113,7 @@ fun SubjectDetailScreen(
         if (subjectQuests.isEmpty()) {
             AnimatedVisibility(visible = visible, enter = fadeIn(tween(delayMillis = 300))) {
                 Text(
-                    "No quests for today. Check back tomorrow!",
+                    s.noQuestsToday,
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
@@ -123,7 +124,7 @@ fun SubjectDetailScreen(
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Spacer(modifier = Modifier.height(8.dp))
                 HorizontalDivider()
-                Text("Lectures (PDF)", style = MaterialTheme.typography.titleLarge)
+                Text(s.lecturesPdf, style = MaterialTheme.typography.titleLarge)
             }
         }
 
@@ -160,13 +161,13 @@ fun SubjectDetailScreen(
                     onClick = { pdfLauncher.launch() },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Add PDF Lecture")
+                    Text(s.addPdfLecture)
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Button(onClick = onBack, modifier = Modifier.fillMaxWidth()) {
-                    Text("Back to subjects")
+                    Text(s.backToSubjects)
                 }
             }
         }
