@@ -140,6 +140,7 @@ fun App() {
                             Screen.SubjectDetail -> selectedSubject?.let { subject ->
                                 SubjectDetailScreen(
                                     subject = subject,
+                                    dailyQuests = dailyQuests,
                                     onBack = { currentScreen = Screen.UniSubjects },
                                 )
                             }

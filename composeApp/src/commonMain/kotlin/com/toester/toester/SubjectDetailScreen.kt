@@ -37,6 +37,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun SubjectDetailScreen(
     subject: Subject,
+    dailyQuests: List<DailyQuest>,
     onBack: () -> Unit,
 ) {
     var visible by remember { mutableStateOf(false) }
@@ -79,17 +80,39 @@ fun SubjectDetailScreen(
             Text("Subject quests", style = MaterialTheme.typography.titleLarge)
         }
 
-        subject.quests.forEachIndexed { index, quest ->
+        val subjectQuests = dailyQuests.filter { it.subjectId == subject.id }
+
+        subjectQuests.forEachIndexed { index, quest ->
             AnimatedVisibility(
                 visible = visible,
                 enter = fadeIn(tween(500, 300 + index * 100)) + slideInVertically(tween(500, 300 + index * 100)) { 20 }
             ) {
                 Card(modifier = Modifier.fillMaxWidth()) {
-                    Text(
-                        text = quest,
-                        modifier = Modifier.padding(12.dp),
-                    )
+                    Row(
+                        modifier = Modifier.padding(12.dp).fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = quest.task,
+                            modifier = Modifier.weight(1f),
+                        )
+                        Text(
+                            text = "+${quest.xpReward} XP",
+                            color = MaterialTheme.colorScheme.primary,
+                            style = MaterialTheme.typography.labelLarge
+                        )
+                    }
                 }
+            }
+        }
+
+        if (subjectQuests.isEmpty()) {
+            AnimatedVisibility(visible = visible, enter = fadeIn(tween(delayMillis = 300))) {
+                Text(
+                    "No quests for today. Check back tomorrow!",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
             }
         }
 
