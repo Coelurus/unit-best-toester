@@ -1,5 +1,6 @@
 package com.toester.toester
 
+import androidx.compose.animation.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -66,85 +67,105 @@ fun App() {
     LaunchedEffect(userId) { loadData() }
 
     MaterialTheme {
-        when (val state = loadState) {
-            is LoadState.Loading -> {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
-                }
+        AnimatedContent(
+            targetState = loadState,
+            transitionSpec = {
+                fadeIn() togetherWith fadeOut()
             }
-
-            is LoadState.Error -> {
-                Column(
-                    Modifier.fillMaxSize().padding(16.dp),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text("Error: ${state.message}")
-                    TextButton(onClick = { loadData() }) { Text("Retry") }
-                }
-            }
-
-            is LoadState.Ready -> {
-                val userProfile = profile ?: return@MaterialTheme
-                when (currentScreen) {
-                    Screen.Landing -> {
-                        LandingScreen(
-                            profile = userProfile,
-                            dailyQuests = dailyQuests,
-                            onOpenSubjects = { currentScreen = Screen.UniSubjects },
-                            onQuestClick = { subjectId ->
-                                val targetSubject = subjects.find { it.id == subjectId }
-                                if (targetSubject != null) {
-                                    selectedSubject = targetSubject
-                                    currentScreen = Screen.SubjectDetail
-                                }
-                            },
-                            onOpenProfile = { currentScreen = Screen.Profile },
-                        )
-                    }
-
-
-                    Screen.UniSubjects -> {
-                        UniSubjectsScreen(
-                            subjects = subjects,
-                            onBack = { currentScreen = Screen.Landing },
-                            onOpenSubject = { subject ->
-                                selectedSubject = subject
-                                currentScreen = Screen.SubjectDetail
-                            },
-                            onAddSubject = { currentScreen = Screen.AddSubject }
-                        )
-                    }
-
-                    Screen.SubjectDetail -> selectedSubject?.let { subject ->
-                        SubjectDetailScreen(
-                            subject = subject,
-                            onBack = { currentScreen = Screen.UniSubjects },
-                        )
-                    }
-
-                    Screen.Profile -> ProfileScreen(
-                        profile = userProfile,
-                        api = api,
-                        onProfileUpdated = { updated ->
-                            profile = updated
-                        },
-                        onBack = { currentScreen = Screen.Landing },
-                    )
-
-                    Screen.AddSubject -> {
-                        AddSubjectScreen(
-                            onAdd = { newSubject ->
-                                subjects.add(newSubject)
-                                currentScreen = Screen.UniSubjects
-                            },
-                            onBack = { currentScreen = Screen.UniSubjects }
-                        )
+        ) { state ->
+            when (state) {
+                is LoadState.Loading -> {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
                     }
                 }
+
+                is LoadState.Error -> {
+                    Column(
+                        Modifier.fillMaxSize().padding(16.dp),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Text("Error: ${state.message}")
+                        TextButton(onClick = { loadData() }) { Text("Retry") }
+                    }
+                }
+
+                is LoadState.Ready -> {
+                    val userProfile = profile ?: return@AnimatedContent
+                    AnimatedContent(
+                        targetState = currentScreen,
+                        transitionSpec = {
+                            if (targetState == Screen.Landing) {
+                                (slideInHorizontally { -it } + fadeIn()) togetherWith
+                                (slideOutHorizontally { it } + fadeOut())
+                            } else {
+                                (slideInHorizontally { it } + fadeIn()) togetherWith
+                                (slideOutHorizontally { -it } + fadeOut())
+                            }.using(
+                                SizeTransform(clip = false)
+                            )
+                        }
+                    ) { screen ->
+                        when (screen) {
+                            Screen.Landing -> {
+                                LandingScreen(
+                                    profile = userProfile,
+                                    dailyQuests = dailyQuests,
+                                    onOpenSubjects = { currentScreen = Screen.UniSubjects },
+                                    onQuestClick = { subjectId ->
+                                        val targetSubject = subjects.find { it.id == subjectId }
+                                        if (targetSubject != null) {
+                                            selectedSubject = targetSubject
+                                            currentScreen = Screen.SubjectDetail
+                                        }
+                                    },
+                                    onOpenProfile = { currentScreen = Screen.Profile },
+                                )
+                            }
+
+
+                            Screen.UniSubjects -> {
+                                UniSubjectsScreen(
+                                    subjects = subjects,
+                                    onBack = { currentScreen = Screen.Landing },
+                                    onOpenSubject = { subject ->
+                                        selectedSubject = subject
+                                        currentScreen = Screen.SubjectDetail
+                                    },
+                                    onAddSubject = { currentScreen = Screen.AddSubject }
+                                )
+                            }
+
+                            Screen.SubjectDetail -> selectedSubject?.let { subject ->
+                                SubjectDetailScreen(
+                                    subject = subject,
+                                    onBack = { currentScreen = Screen.UniSubjects },
+                                )
+                            }
+
+                            Screen.Profile -> ProfileScreen(
+                                profile = userProfile,
+                                api = api,
+                                onProfileUpdated = { updated ->
+                                    profile = updated
+                                },
+                                onBack = { currentScreen = Screen.Landing },
+                            )
+
+                            Screen.AddSubject -> {
+                                AddSubjectScreen(
+                                    onAdd = { newSubject ->
+                                        subjects.add(newSubject)
+                                        currentScreen = Screen.UniSubjects
+                                    },
+                                    onBack = { currentScreen = Screen.UniSubjects }
+                                )
+                            }
+                        }
+                    }
+                }
             }
-
-
         }
     }
 }

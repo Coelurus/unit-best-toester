@@ -1,5 +1,9 @@
 package com.toester.toester
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -36,6 +40,8 @@ fun ProfileScreen(
     onProfileUpdated: (UserProfile) -> Unit,
     onBack: () -> Unit,
 ) {
+    var visible by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { visible = true }
     val scope = rememberCoroutineScope()
 
     // Editable fields
@@ -108,14 +114,18 @@ fun ProfileScreen(
             )
         }
     ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(horizontal = 16.dp)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+        AnimatedVisibility(
+            visible = visible,
+            enter = fadeIn(tween(600)) + slideInVertically(tween(600)) { 20 }
         ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .padding(horizontal = 16.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
             // ── Avatar & Name ──────────────────────────────
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -492,6 +502,7 @@ fun ProfileScreen(
             Spacer(Modifier.height(24.dp))
         }
     }
+}
 }
 
 // ── Data URI → ImageBitmap helper ──────────────────────────
