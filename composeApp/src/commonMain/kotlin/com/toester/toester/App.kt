@@ -18,10 +18,10 @@ import kotlinx.coroutines.launch
 
 private enum class Screen {
     Landing,
-    AccountSettings,
     UniSubjects,
     SubjectDetail,
     AddSubject,
+    Profile,
 }
 
 private sealed class LoadState {
@@ -55,7 +55,7 @@ fun App() {
                 loadState = LoadState.Ready
             } catch (e: Exception) {
                 // fallback to local sample data so the UI is still usable
-                profile = UserProfile(id = userId, name = "Alex", streakDays = 0, xp = 0)
+                profile = UserProfile(id = userId, name = "Alex", nickname = "alex", streakDays = 0, xp = 0)
                 subjects = sampleSubjects()
                 dailyQuests = buildDailyQuests(subjects)
                 loadState = LoadState.Ready
@@ -87,21 +87,13 @@ fun App() {
             is LoadState.Ready -> {
                 val userProfile = profile ?: return@MaterialTheme
                 when (currentScreen) {
-                    Screen.Landing -> {
-                        LandingScreen(
-                            profile = userProfile,
-                            dailyQuests = dailyQuests,
-                            onOpenAccountSettings = { currentScreen = Screen.AccountSettings },
-                            onOpenSubjects = { currentScreen = Screen.UniSubjects },
-                        )
-                    }
+                    Screen.Landing -> LandingScreen(
+                        profile = userProfile,
+                        dailyQuests = dailyQuests,
+                        onOpenSubjects = { currentScreen = Screen.UniSubjects },
+                        onOpenProfile = { currentScreen = Screen.Profile },
+                    )
 
-                    Screen.AccountSettings -> {
-                        AccountSettingsScreen(
-                            profile = userProfile,
-                            onBack = { currentScreen = Screen.Landing },
-                        )
-                    }
 
                     Screen.UniSubjects -> {
                         UniSubjectsScreen(
@@ -115,14 +107,21 @@ fun App() {
                         )
                     }
 
-                    Screen.SubjectDetail -> {
-                        selectedSubject?.let { subject ->
-                            SubjectDetailScreen(
-                                subject = subject,
-                                onBack = { currentScreen = Screen.UniSubjects },
-                            )
-                        }
+                    Screen.SubjectDetail -> selectedSubject?.let { subject ->
+                        SubjectDetailScreen(
+                            subject = subject,
+                            onBack = { currentScreen = Screen.UniSubjects },
+                        )
                     }
+
+                    Screen.Profile -> ProfileScreen(
+                        profile = userProfile,
+                        api = api,
+                        onProfileUpdated = { updated ->
+                            profile = updated
+                        },
+                        onBack = { currentScreen = Screen.Landing },
+                    )
 
                     Screen.AddSubject -> {
                         AddSubjectScreen(
@@ -133,10 +132,10 @@ fun App() {
                             onBack = { currentScreen = Screen.UniSubjects }
                         )
                     }
+
+
                 }
             }
-
-
         }
     }
 }

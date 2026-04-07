@@ -45,5 +45,39 @@ class ToesterApi {
     suspend fun getDailyQuests(userId: String): List<DailyQuest> {
         return client.get("$base/api/quests/$userId").body()
     }
+
+    // ---- Friends ----
+
+    suspend fun getFriends(userId: String): List<Friend> {
+        return client.get("$base/api/friends/$userId").body()
+    }
+
+    suspend fun sendFriendRequest(fromUserId: String, toUserId: String): FriendRequest {
+        return client.post("$base/api/friend-requests/send/$fromUserId") {
+            contentType(ContentType.Application.Json)
+            setBody(SendFriendRequestBody(toUserId = toUserId))
+        }.body()
+    }
+
+    suspend fun getIncomingFriendRequests(userId: String): List<FriendRequest> {
+        return client.get("$base/api/friend-requests/incoming/$userId").body()
+    }
+
+    suspend fun getOutgoingFriendRequests(userId: String): List<FriendRequest> {
+        return client.get("$base/api/friend-requests/outgoing/$userId").body()
+    }
+
+    suspend fun respondToFriendRequest(requestId: String, accept: Boolean): FriendRequest {
+        return client.put("$base/api/friend-requests/$requestId") {
+            contentType(ContentType.Application.Json)
+            setBody(RespondFriendRequestBody(accept = accept))
+        }.body()
+    }
+
+    // ---- XP History ----
+
+    suspend fun getXpHistory(userId: String): List<XpHistoryEntry> {
+        return client.get("$base/api/xp-history/$userId").body()
+    }
 }
 

@@ -21,8 +21,8 @@ import androidx.compose.ui.unit.dp
 fun LandingScreen(
     profile: UserProfile,
     dailyQuests: List<DailyQuest>,
-    onOpenAccountSettings: () -> Unit,
     onOpenSubjects: () -> Unit,
+    onOpenProfile: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -70,11 +70,12 @@ fun LandingScreen(
         }
 
         Button(
-            onClick = onOpenAccountSettings,
+            onClick = onOpenProfile,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Text("Account settings")
+            Text("My profile")
         }
+
 
         OutlinedButton(
             onClick = onOpenSubjects,
