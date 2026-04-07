@@ -21,6 +21,7 @@ private enum class Screen {
     AccountSettings,
     UniSubjects,
     SubjectDetail,
+    AddSubject,
 }
 
 private sealed class LoadState {
@@ -32,13 +33,14 @@ private sealed class LoadState {
 @Composable
 @Preview
 fun App() {
+
     val api = remember { ToesterApi() }
     val userId = "alex" // active user id
     val scope = rememberCoroutineScope()
 
     var loadState by remember { mutableStateOf<LoadState>(LoadState.Loading) }
     var profile by remember { mutableStateOf<UserProfile?>(null) }
-    var subjects by remember { mutableStateOf<List<Subject>>(emptyList()) }
+    var subjects by remember { mutableStateOf<MutableList<Subject>>(mutableListOf()) }
     var dailyQuests by remember { mutableStateOf<List<DailyQuest>>(emptyList()) }
     var currentScreen by remember { mutableStateOf(Screen.Landing) }
     var selectedSubject by remember { mutableStateOf<Subject?>(null) }
@@ -109,6 +111,7 @@ fun App() {
                                 selectedSubject = subject
                                 currentScreen = Screen.SubjectDetail
                             },
+                            onAddSubject = { currentScreen = Screen.AddSubject }
                         )
                     }
 
@@ -120,8 +123,20 @@ fun App() {
                             )
                         }
                     }
+
+                    Screen.AddSubject -> {
+                        AddSubjectScreen(
+                            onAdd = { newSubject ->
+                                subjects.add(newSubject)
+                                currentScreen = Screen.UniSubjects
+                            },
+                            onBack = { currentScreen = Screen.UniSubjects }
+                        )
+                    }
                 }
             }
+
+
         }
     }
 }

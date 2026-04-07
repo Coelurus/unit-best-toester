@@ -36,7 +36,7 @@ class ToesterApi {
 
     // ---- Subjects ----
 
-    suspend fun getSubjects(userId: String): List<Subject> {
+    suspend fun getSubjects(userId: String): MutableList<Subject> {
         return client.get("$base/api/subjects/$userId").body()
     }
 

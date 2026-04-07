@@ -3,8 +3,8 @@ package com.toester.toester
 // Models (UserProfile, Subject, DailyQuest) are now in shared module.
 // This file keeps local helpers only.
 
-fun sampleSubjects(): List<Subject> {
-    return listOf(
+fun sampleSubjects(): MutableList<Subject> {
+    return mutableListOf(
         Subject(
             id = "math",
             name = "Math",
