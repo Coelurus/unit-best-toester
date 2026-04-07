@@ -10,6 +10,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Timer
 import kotlinx.coroutines.delay
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
@@ -69,7 +73,7 @@ actual fun PdfViewer(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                Text("📄", style = MaterialTheme.typography.displaySmall)
+                Icon(Icons.Filled.Description, contentDescription = "PDF", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(48.dp))
 
                 Text(
                     pdfName,
@@ -99,8 +103,9 @@ actual fun PdfViewer(
                         }
                     } else if (pdfTabOpen) {
                         // State 2: PDF tab is open — show live timer
+                        Icon(Icons.Filled.Timer, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(32.dp))
                         Text(
-                            "⏱ Reading…  ${formatTime(elapsedSeconds)}",
+                            "Reading...  ${formatTime(elapsedSeconds)}",
                             style = MaterialTheme.typography.titleLarge,
                             color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Bold,
@@ -114,13 +119,14 @@ actual fun PdfViewer(
                         LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
                     } else {
                         // State 3: Tab was closed — show final time
+                        Icon(Icons.Filled.CheckCircle, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(32.dp))
                         Text(
-                            "✅ Done reading!",
+                            "Done reading!",
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.primary,
                         )
                         Text(
-                            "⏱ ${formatTime(elapsedSeconds)}",
+                            formatTime(elapsedSeconds),
                             style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary,

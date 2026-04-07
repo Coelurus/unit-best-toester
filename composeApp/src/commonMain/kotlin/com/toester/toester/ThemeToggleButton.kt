@@ -3,15 +3,17 @@ package com.toester.toester
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 @Composable
 fun ThemeToggleButton(modifier: Modifier = Modifier) {
@@ -26,9 +28,11 @@ fun ThemeToggleButton(modifier: Modifier = Modifier) {
             .clip(CircleShape)
             .background(MaterialTheme.colorScheme.surfaceVariant),
     ) {
-        Text(
-            text = if (isDark) "☀️" else "🌙",
-            fontSize = 20.sp,
+        Icon(
+            imageVector = if (isDark) Icons.Filled.LightMode else Icons.Filled.DarkMode,
+            contentDescription = if (isDark) "Switch to light" else "Switch to dark",
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(22.dp),
         )
     }
 }

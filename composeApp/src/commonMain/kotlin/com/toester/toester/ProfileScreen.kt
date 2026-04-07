@@ -31,6 +31,10 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.LocalFireDepartment
+import androidx.compose.material.icons.filled.Warning
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -218,11 +222,14 @@ fun ProfileScreen(
                         }
                         Column(horizontalAlignment = Alignment.End) {
                             Text(s.streak, style = MaterialTheme.typography.bodySmall)
-                            Text(
-                                "🔥 ${profile.streakDays} ${s.days}",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                            )
+                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                                Icon(Icons.Filled.LocalFireDepartment, contentDescription = null, tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(20.dp))
+                                Text(
+                                    "${profile.streakDays} ${s.days}",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                )
+                            }
                         }
                     }
                 }
@@ -336,7 +343,7 @@ fun ProfileScreen(
                                 contentAlignment = Alignment.Center,
                             ) {
                                 if (isFirst) {
-                                    Text("🏆", style = MaterialTheme.typography.titleLarge)
+                                    Icon(Icons.Filled.EmojiEvents, contentDescription = "1st place", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(28.dp))
                                 } else {
                                     Text(
                                         "#$rank",
@@ -496,7 +503,10 @@ fun ProfileScreen(
                 }
 
                 friendError?.let {
-                    Text("⚠️ $it", color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Filled.Warning, contentDescription = null, tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(16.dp))
+                        Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+                    }
                 }
             }
 
