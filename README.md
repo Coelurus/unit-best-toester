@@ -1,5 +1,20 @@
 This is a Kotlin Multiplatform project targeting Android, Web, Server.
 
+## Current app flow (composeApp)
+
+The `composeApp` home UI now starts on a landing page with:
+- a greeting (`Hi <user>`)
+- streak and XP overview
+- daily quests generated from university subjects
+- links to:
+  - account settings
+  - university subjects
+
+Subpages available from those links:
+- account settings page
+- university subjects page
+- subject detail page for each listed subject
+
 * [/composeApp](./composeApp/src) is for code that will be shared across your Compose Multiplatform applications.
   It contains several subfolders:
     - [commonMain](./composeApp/src/commonMain/kotlin) is for code that’s common for all targets.
