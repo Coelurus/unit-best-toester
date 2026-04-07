@@ -27,12 +27,17 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.compose.runtime.rememberCoroutineScope
 import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.core.PickerType
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 @Composable
 fun SubjectDetailScreen(
@@ -51,6 +56,12 @@ fun SubjectDetailScreen(
     val awardedMinutes = remember { mutableStateMapOf<String, Long>() } // already-awarded minutes per PDF
     var selectedPdfToView by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
+
+    // Flashcard states: mapping from PDF name to whether flashcards exist
+    val flashcardsExist = remember { mutableStateMapOf<String, Boolean>() }
+    // State to show loading overlay during flashcard generation
+    var generatingFlashcardFor by remember { mutableStateOf<String?>(null) }
+    var loadingMessage by remember { mutableStateOf("") }
 
     val pdfLauncher = rememberFilePickerLauncher(
         type = PickerType.File(listOf("pdf")),
@@ -133,23 +144,65 @@ fun SubjectDetailScreen(
                 onClick = { selectedPdfToView = pdfName },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(12.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                ) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text("📄", style = MaterialTheme.typography.titleMedium)
-                        Text(text = pdfName, style = MaterialTheme.typography.bodyLarge)
+                Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                    ) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Text("📄", style = MaterialTheme.typography.titleMedium)
+                            Text(text = pdfName, style = MaterialTheme.typography.bodyLarge)
+                        }
+                        val totalSec = readingTimes[pdfName] ?: 0L
+                        if (totalSec > 0) {
+                            val m = totalSec / 60
+                            val s = totalSec % 60
+                            Text(
+                                text = if (m > 0) "⏱ ${m}m ${s}s" else "⏱ ${s}s",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.primary,
+                            )
+                        }
                     }
-                    val totalSec = readingTimes[pdfName] ?: 0L
-                    if (totalSec > 0) {
-                        val m = totalSec / 60
-                        val s = totalSec % 60
-                        Text(
-                            text = if (m > 0) "⏱ ${m}m ${s}s" else "⏱ ${s}s",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.primary,
-                        )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Button(
+                        onClick = {
+                            scope.launch {
+                                generatingFlashcardFor = pdfName
+                                loadingMessage = "Extracting key concepts from $pdfName..."
+                                val seconds = Random.nextInt(2, 6)
+                                delay(seconds * 1000L)
+                                flashcardsExist[pdfName] = true
+                                generatingFlashcardFor = null
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(if (flashcardsExist[pdfName] == true) "Regenerate Flash Cards" else "Generate Flash Cards")
+                    }
+                }
+            }
+
+            // Show flash card tile if it exists for this PDF
+            if (flashcardsExist[pdfName] == true) {
+                Card(
+                    modifier = Modifier.fillMaxWidth().padding(start = 24.dp, top = 4.dp, bottom = 8.dp),
+                    colors = androidx.compose.material3.CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer
+                    )
+                ) {
+                    Row(
+                        modifier = Modifier.padding(12.dp).fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("💡", style = MaterialTheme.typography.titleMedium)
+                        Column {
+                            Text("Flash Cards: $pdfName", style = MaterialTheme.typography.titleSmall)
+                            Text("Practice with generated questions", style = MaterialTheme.typography.bodySmall)
+                        }
                     }
                 }
             }
@@ -191,6 +244,25 @@ fun SubjectDetailScreen(
                 }
             },
         )
+    }
+
+    // Loading overlay for flashcard generation
+    if (generatingFlashcardFor != null) {
+        Dialog(onDismissRequest = {}) {
+            Card(
+                modifier = Modifier.padding(16.dp),
+                shape = MaterialTheme.shapes.medium
+            ) {
+                Column(
+                    modifier = Modifier.padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    CircularProgressIndicator()
+                    Text(loadingMessage, style = MaterialTheme.typography.bodyMedium)
+                }
+            }
+        }
     }
 }
 
