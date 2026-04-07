@@ -16,6 +16,8 @@ data class Subject(
     val name: String,
     val teacher: String,
     val quests: List<String>,
+    val pdfs: List<String> = emptyList(),
+    val pdfData: Map<String, ByteArray> = emptyMap(),
 )
 
 @Serializable

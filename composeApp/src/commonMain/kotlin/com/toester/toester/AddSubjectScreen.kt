@@ -64,7 +64,9 @@ fun AddSubjectScreen(
                                 id = id,
                                 name = name,
                                 teacher = teacher,
-                                quests = emptyList() // Start with no quests
+                                quests = emptyList(), // Start with no quests
+                                pdfs = emptyList(),
+                                pdfData = emptyMap(),
                             )
                         )
                     }
