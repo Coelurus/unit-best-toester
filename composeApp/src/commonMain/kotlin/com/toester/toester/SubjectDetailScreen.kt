@@ -39,7 +39,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.Icon
+import androidx.compose.material3.FilledTonalButton
 import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.core.PickerType
 import kotlinx.coroutines.delay
@@ -52,6 +54,7 @@ fun SubjectDetailScreen(
     dailyQuests: List<DailyQuest>,
     onBack: () -> Unit,
     onXpEarned: (Int) -> Unit = {},
+    onCompleteQuest: (DailyQuest) -> Unit = {},
 ) {
     var visible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { visible = true }
@@ -116,17 +119,24 @@ fun SubjectDetailScreen(
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Row(
                         modifier = Modifier.padding(12.dp).fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Text(
-                            text = quest.task,
-                            modifier = Modifier.weight(1f),
-                        )
-                        Text(
-                            text = "+${quest.xpReward} XP",
-                            color = MaterialTheme.colorScheme.primary,
-                            style = MaterialTheme.typography.labelLarge
-                        )
+                        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                            Text(text = quest.task)
+                            Text(
+                                text = "+${quest.xpReward} XP",
+                                color = MaterialTheme.colorScheme.primary,
+                                style = MaterialTheme.typography.labelLarge
+                            )
+                        }
+                        FilledTonalButton(
+                            onClick = { onCompleteQuest(quest) },
+                        ) {
+                            Icon(Icons.Filled.CheckCircle, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Spacer(Modifier.size(4.dp))
+                            Text(s.completeQuest)
+                        }
                     }
                 }
             }

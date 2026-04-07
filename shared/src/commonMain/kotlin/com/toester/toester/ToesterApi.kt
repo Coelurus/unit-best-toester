@@ -52,6 +52,13 @@ class ToesterApi {
         return client.get("$base/api/quests/$userId").body()
     }
 
+    suspend fun completeQuest(userId: String, quest: DailyQuest): UserProfile {
+        return client.post("$base/api/quests/complete/$userId") {
+            contentType(ContentType.Application.Json)
+            setBody(CompleteQuestBody(task = quest.task, xpReward = quest.xpReward))
+        }.body()
+    }
+
     // ---- Friends ----
 
     suspend fun getFriends(userId: String): List<Friend> {

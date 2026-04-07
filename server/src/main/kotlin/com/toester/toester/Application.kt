@@ -101,6 +101,9 @@ private val xpHistory = mutableMapOf(
 
 // --------------- helpers ---------------
 
+// Completed quests today – key is "$userId::$task", prevents double-completing
+private val completedQuests = mutableSetOf<String>()
+
 private val questPool = listOf(
     "Solve 10 problems of %s",
     "Review %s lecture notes",
@@ -241,7 +244,28 @@ fun Application.module() {
                 val userId = call.parameters["userId"]!!
                 val subjects = userSubjects[userId]
                     ?: return@get call.respondText("User not found", status = HttpStatusCode.NotFound)
-                call.respond(buildDailyQuests(userId, subjects))
+                val allQuests = buildDailyQuests(userId, subjects)
+                // Filter out already-completed quests
+                val remaining = allQuests.filter { "${userId}::${it.task}" !in completedQuests }
+                call.respond(remaining)
+            }
+
+            post("/complete/{userId}") {
+                val userId = call.parameters["userId"]!!
+                val body = call.receive<CompleteQuestBody>()
+                val profile = profiles[userId]
+                    ?: return@post call.respondText("User not found", status = HttpStatusCode.NotFound)
+
+                val key = "${userId}::${body.task}"
+                if (key in completedQuests) {
+                    return@post call.respondText("Quest already completed", status = HttpStatusCode.Conflict)
+                }
+
+                completedQuests.add(key)
+                // Award XP
+                val updated = profile.copy(xp = profile.xp + body.xpReward)
+                profiles[userId] = updated
+                call.respond(updated)
             }
         }
 

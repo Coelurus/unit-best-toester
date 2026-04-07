@@ -67,6 +67,10 @@ data class Strings(
     // PdfViewer
     val close: String,
     val pdfNotAvailable: String,
+
+    // Quests
+    val completeQuest: String,
+    val questCompleted: String,
 )
 
 val EnStrings = Strings(
@@ -118,6 +122,8 @@ val EnStrings = Strings(
     selectPdfLecture = "Select PDF Lecture",
     close = "Close",
     pdfNotAvailable = "PDF data not available for",
+    completeQuest = "Complete",
+    questCompleted = "Done!",
 )
 
 val CsStrings = Strings(
@@ -169,6 +175,8 @@ val CsStrings = Strings(
     selectPdfLecture = "Vybrat PDF přednášku",
     close = "Zavřít",
     pdfNotAvailable = "PDF data nejsou dostupná pro",
+    completeQuest = "Splnit",
+    questCompleted = "Hotovo!",
 )
 
 val LocalStrings = compositionLocalOf { EnStrings }

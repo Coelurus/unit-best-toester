@@ -170,6 +170,18 @@ fun App() {
                                             currentScreen = Screen.SubjectDetail
                                         }
                                     },
+                                    onCompleteQuest = { quest ->
+                                        scope.launch {
+                                            try {
+                                                val updated = api.completeQuest(userId, quest)
+                                                profile = updated
+                                                dailyQuests = dailyQuests.filter { it.task != quest.task }
+                                            } catch (_: Exception) {
+                                                profile = profile?.copy(xp = (profile?.xp ?: 0) + quest.xpReward)
+                                                dailyQuests = dailyQuests.filter { it.task != quest.task }
+                                            }
+                                        }
+                                    },
                                     onOpenProfile = { currentScreen = Screen.Profile },
                                 )
                             }
@@ -194,6 +206,18 @@ fun App() {
                                     onBack = { currentScreen = Screen.UniSubjects },
                                     onXpEarned = { xp ->
                                         profile = profile?.copy(xp = (profile?.xp ?: 0) + xp)
+                                    },
+                                    onCompleteQuest = { quest ->
+                                        scope.launch {
+                                            try {
+                                                val updated = api.completeQuest(userId, quest)
+                                                profile = updated
+                                                dailyQuests = dailyQuests.filter { it.task != quest.task }
+                                            } catch (_: Exception) {
+                                                profile = profile?.copy(xp = (profile?.xp ?: 0) + quest.xpReward)
+                                                dailyQuests = dailyQuests.filter { it.task != quest.task }
+                                            }
+                                        }
                                     },
                                 )
                             }

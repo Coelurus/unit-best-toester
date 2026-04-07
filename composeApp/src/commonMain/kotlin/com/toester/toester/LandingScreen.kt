@@ -10,13 +10,18 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -32,6 +37,7 @@ fun LandingScreen(
     dailyQuests: List<DailyQuest>,
     onOpenSubjects: () -> Unit,
     onQuestClick: (String) -> Unit,
+    onCompleteQuest: (DailyQuest) -> Unit,
     onOpenProfile: () -> Unit,
 ) {
     var visible by remember { mutableStateOf(false) }
@@ -100,7 +106,22 @@ fun LandingScreen(
                     Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text(quest.subjectName, style = MaterialTheme.typography.titleMedium)
                         Text(quest.task)
-                        Text("+${quest.xpReward} XP", style = MaterialTheme.typography.bodySmall)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                        ) {
+                            Text("+${quest.xpReward} XP", style = MaterialTheme.typography.bodySmall)
+                            FilledTonalButton(
+                                onClick = { onCompleteQuest(quest) },
+                                modifier = Modifier.size(height = 32.dp, width = 110.dp),
+                                contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 12.dp, vertical = 0.dp),
+                            ) {
+                                Icon(Icons.Filled.CheckCircle, contentDescription = null, modifier = Modifier.size(16.dp))
+                                androidx.compose.foundation.layout.Spacer(Modifier.size(4.dp))
+                                Text(s.completeQuest, style = MaterialTheme.typography.labelSmall)
+                            }
+                        }
                     }
                 }
             }

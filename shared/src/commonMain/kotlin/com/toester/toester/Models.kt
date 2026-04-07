@@ -62,6 +62,12 @@ data class RespondFriendRequestBody(
 )
 
 @Serializable
+data class CompleteQuestBody(
+    val task: String,
+    val xpReward: Int,
+)
+
+@Serializable
 data class XpHistoryEntry(
     val day: String,
     val xp: Int,
