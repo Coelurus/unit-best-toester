@@ -1,12 +1,3 @@
-            Text("Close")
-                    // For many Android versions, WebView cannot render PDF directly via data URL.
-                    // The "most reliable" without a library is usually a JS-based viewer like PDF.js
-                    // or redirecting to a viewer service.
-                    // Here we try to use a simple HTML with an embed/iframe that might work on some versions
-                    // or at least show we are trying to render the actual content.
-                        // Google Drive Viewer is a common way to display PDFs in WebView
-                        // But since we have local bytes, we can try to use a data URL
-                        // Note: Large PDFs might fail with data URL.
 package com.toester.toester
 
 import android.webkit.WebView
