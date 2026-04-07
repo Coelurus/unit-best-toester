@@ -22,6 +22,7 @@ fun UniSubjectsScreen(
     subjects: List<Subject>,
     onBack: () -> Unit,
     onOpenSubject: (Subject) -> Unit,
+    onAddSubject: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -51,7 +52,11 @@ fun UniSubjectsScreen(
             }
         }
 
-        Button(onClick = onBack, modifier = Modifier.fillMaxWidth()) {
+        Button(onClick = onAddSubject, modifier = Modifier.fillMaxWidth()) {
+            Text("Add Subject")
+        }
+
+        OutlinedButton(onClick = onBack, modifier = Modifier.fillMaxWidth()) {
             Text("Back to landing")
         }
     }

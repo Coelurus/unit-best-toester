@@ -9,6 +9,7 @@ private enum class Screen {
     AccountSettings,
     UniSubjects,
     SubjectDetail,
+    AddSubject,
 }
 
 @Composable
@@ -21,8 +22,8 @@ fun App() {
             xp = 1240,
         )
     }
-    val subjects = remember { sampleSubjects() }
-    val dailyQuests = remember(subjects) { buildDailyQuests(subjects) }
+    val subjects = remember { mutableStateListOf(*sampleSubjects().toTypedArray()) }
+    val dailyQuests = remember(subjects.size) { buildDailyQuests(subjects) }
     var currentScreen by remember { mutableStateOf(Screen.Landing) }
     var selectedSubject by remember { mutableStateOf<Subject?>(null) }
 
@@ -52,6 +53,7 @@ fun App() {
                         selectedSubject = subject
                         currentScreen = Screen.SubjectDetail
                     },
+                    onAddSubject = { currentScreen = Screen.AddSubject }
                 )
             }
 
@@ -62,6 +64,16 @@ fun App() {
                         onBack = { currentScreen = Screen.UniSubjects },
                     )
                 }
+            }
+
+            Screen.AddSubject -> {
+                AddSubjectScreen(
+                    onAdd = { newSubject ->
+                        subjects.add(newSubject)
+                        currentScreen = Screen.UniSubjects
+                    },
+                    onBack = { currentScreen = Screen.UniSubjects }
+                )
             }
         }
     }
