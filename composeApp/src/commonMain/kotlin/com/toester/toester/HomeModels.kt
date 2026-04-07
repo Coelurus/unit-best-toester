@@ -1,23 +1,7 @@
 package com.toester.toester
 
-data class UserProfile(
-    val name: String,
-    val streakDays: Int,
-    val xp: Int,
-)
-
-data class Subject(
-    val id: String,
-    val name: String,
-    val teacher: String,
-    val quests: List<String>,
-)
-
-data class DailyQuest(
-    val subjectName: String,
-    val task: String,
-    val xpReward: Int,
-)
+// Models (UserProfile, Subject, DailyQuest) are now in shared module.
+// This file keeps local helpers only.
 
 fun sampleSubjects(): List<Subject> {
     return listOf(
