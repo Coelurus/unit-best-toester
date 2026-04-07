@@ -137,6 +137,15 @@ fun App() {
                                 )
                             }
 
+                    Screen.SubjectDetail -> selectedSubject?.let { subject ->
+                        SubjectDetailScreen(
+                            subject = subject,
+                            onBack = { currentScreen = Screen.UniSubjects },
+                            onXpEarned = { xp ->
+                                profile = profile?.copy(xp = (profile?.xp ?: 0) + xp)
+                            },
+                        )
+                    }
                             Screen.SubjectDetail -> selectedSubject?.let { subject ->
                                 SubjectDetailScreen(
                                     subject = subject,

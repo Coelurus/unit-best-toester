@@ -241,7 +241,7 @@ fun Application.module() {
                 val userId = call.parameters["userId"]!!
                 val subjects = userSubjects[userId]
                     ?: return@get call.respondText("User not found", status = HttpStatusCode.NotFound)
-                call.respond(buildDailyQuests(subjects))
+                call.respond(buildDailyQuests(userId, subjects))
             }
         }
 

@@ -6,5 +6,6 @@ import androidx.compose.runtime.Composable
 expect fun PdfViewer(
     pdfName: String,
     pdfBytes: ByteArray?,
-    onClose: () -> Unit
+    onClose: () -> Unit,
+    onTimeSpent: (seconds: Long) -> Unit = {},
 )

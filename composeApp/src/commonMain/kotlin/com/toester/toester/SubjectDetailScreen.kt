@@ -39,12 +39,15 @@ fun SubjectDetailScreen(
     subject: Subject,
     dailyQuests: List<DailyQuest>,
     onBack: () -> Unit,
+    onXpEarned: (Int) -> Unit = {},
 ) {
     var visible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { visible = true }
 
     val pdfs = remember { mutableStateListOf<String>().apply { addAll(subject.pdfs) } }
     val pdfData = remember { mutableStateMapOf<String, ByteArray>().apply { putAll(subject.pdfData) } }
+    val readingTimes = remember { mutableStateMapOf<String, Long>() } // accumulated seconds per PDF
+    val awardedMinutes = remember { mutableStateMapOf<String, Long>() } // already-awarded minutes per PDF
     var selectedPdfToView by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
 
@@ -124,21 +127,28 @@ fun SubjectDetailScreen(
             }
         }
 
-        pdfs.forEachIndexed { index, pdfName ->
-            AnimatedVisibility(
-                visible = visible,
-                enter = fadeIn(tween(500, 600 + index * 100)) + slideInVertically(tween(500, 600 + index * 100)) { 20 }
+        pdfs.forEach { pdfName ->
+            Card(
+                onClick = { selectedPdfToView = pdfName },
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Card(
-                    onClick = { selectedPdfToView = pdfName },
-                    modifier = Modifier.fillMaxWidth()
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
-                    Row(
-                        modifier = Modifier.padding(12.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text("📄", style = MaterialTheme.typography.titleMedium)
                         Text(text = pdfName, style = MaterialTheme.typography.bodyLarge)
+                    }
+                    val totalSec = readingTimes[pdfName] ?: 0L
+                    if (totalSec > 0) {
+                        val m = totalSec / 60
+                        val s = totalSec % 60
+                        Text(
+                            text = if (m > 0) "⏱ ${m}m ${s}s" else "⏱ ${s}s",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
                     }
                 }
             }
@@ -166,7 +176,19 @@ fun SubjectDetailScreen(
         PdfViewer(
             pdfName = selectedPdfToView!!,
             pdfBytes = pdfData[selectedPdfToView!!],
-            onClose = { selectedPdfToView = null }
+            onClose = { selectedPdfToView = null },
+            onTimeSpent = { seconds ->
+                val name = selectedPdfToView ?: return@PdfViewer
+                readingTimes[name] = (readingTimes[name] ?: 0L) + seconds
+                // Award 1 XP for every full minute of reading
+                val totalMinutes = (readingTimes[name] ?: 0L) / 60
+                val alreadyAwarded = awardedMinutes[name] ?: 0L
+                val newMinutes = totalMinutes - alreadyAwarded
+                if (newMinutes > 0) {
+                    awardedMinutes[name] = totalMinutes
+                    onXpEarned(newMinutes.toInt())
+                }
+            },
         )
     }
 }
