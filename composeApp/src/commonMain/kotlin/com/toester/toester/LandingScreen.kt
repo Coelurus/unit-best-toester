@@ -1,4 +1,4 @@
-package com.toester.toester
+    package com.toester.toester
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -22,6 +22,7 @@ fun LandingScreen(
     profile: UserProfile,
     dailyQuests: List<DailyQuest>,
     onOpenSubjects: () -> Unit,
+    onQuestClick: (String) -> Unit,
     onOpenProfile: () -> Unit,
 ) {
     Column(
@@ -60,7 +61,10 @@ fun LandingScreen(
         )
 
         dailyQuests.forEach { quest ->
-            Card(modifier = Modifier.fillMaxWidth()) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { onQuestClick(quest.subjectId) }
+            ) {
                 Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(quest.subjectName, style = MaterialTheme.typography.titleMedium)
                     Text(quest.task)

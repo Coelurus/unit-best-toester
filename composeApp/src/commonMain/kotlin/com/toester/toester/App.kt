@@ -57,7 +57,7 @@ fun App() {
                 // fallback to local sample data so the UI is still usable
                 profile = UserProfile(id = userId, name = "Alex", nickname = "alex", streakDays = 0, xp = 0)
                 subjects = sampleSubjects()
-                dailyQuests = buildDailyQuests(subjects)
+                dailyQuests = buildDailyQuests(userId, subjects)
                 loadState = LoadState.Ready
             }
         }
@@ -87,12 +87,21 @@ fun App() {
             is LoadState.Ready -> {
                 val userProfile = profile ?: return@MaterialTheme
                 when (currentScreen) {
-                    Screen.Landing -> LandingScreen(
-                        profile = userProfile,
-                        dailyQuests = dailyQuests,
-                        onOpenSubjects = { currentScreen = Screen.UniSubjects },
-                        onOpenProfile = { currentScreen = Screen.Profile },
-                    )
+                    Screen.Landing -> {
+                        LandingScreen(
+                            profile = userProfile,
+                            dailyQuests = dailyQuests,
+                            onOpenSubjects = { currentScreen = Screen.UniSubjects },
+                            onQuestClick = { subjectId ->
+                                val targetSubject = subjects.find { it.id == subjectId }
+                                if (targetSubject != null) {
+                                    selectedSubject = targetSubject
+                                    currentScreen = Screen.SubjectDetail
+                                }
+                            },
+                            onOpenProfile = { currentScreen = Screen.Profile },
+                        )
+                    }
 
 
                     Screen.UniSubjects -> {
@@ -132,10 +141,10 @@ fun App() {
                             onBack = { currentScreen = Screen.UniSubjects }
                         )
                     }
-
-
                 }
             }
+
+
         }
     }
 }

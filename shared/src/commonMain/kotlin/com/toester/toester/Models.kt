@@ -24,6 +24,7 @@ data class Subject(
 
 @Serializable
 data class DailyQuest(
+    val subjectId: String,
     val subjectName: String,
     val task: String,
     val xpReward: Int,
