@@ -1,6 +1,7 @@
 package com.toester.toester
 
 import androidx.compose.animation.*
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,11 +9,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
@@ -66,8 +71,45 @@ fun App() {
 
     LaunchedEffect(userId) { loadData() }
 
-    MaterialTheme {
-        AnimatedContent(
+    val systemDark = isSystemInDarkTheme()
+    var isDarkMode by remember { mutableStateOf(systemDark) }
+    val toggleDarkMode = { isDarkMode = !isDarkMode }
+
+    val toesterDark = darkColorScheme(
+        primary = Color(0xFFBB86FC),
+        onPrimary = Color(0xFF000000),
+        primaryContainer = Color(0xFF3700B3),
+        onPrimaryContainer = Color(0xFFE8DEF8),
+        secondary = Color(0xFF03DAC6),
+        onSecondary = Color(0xFF000000),
+        secondaryContainer = Color(0xFF1B3534),
+        onSecondaryContainer = Color(0xFFCCF2EE),
+        background = Color(0xFF121212),
+        onBackground = Color(0xFFE6E1E5),
+        surface = Color(0xFF1E1E1E),
+        onSurface = Color(0xFFE6E1E5),
+        surfaceVariant = Color(0xFF2D2D2D),
+        onSurfaceVariant = Color(0xFFCAC4D0),
+        outline = Color(0xFF938F99),
+        outlineVariant = Color(0xFF49454F),
+        error = Color(0xFFCF6679),
+    )
+
+    val toesterLight = lightColorScheme()
+
+    val colorScheme = if (isDarkMode) toesterDark else toesterLight
+
+    CompositionLocalProvider(
+        LocalIsDarkMode provides isDarkMode,
+        LocalToggleDarkMode provides toggleDarkMode,
+    ) {
+        MaterialTheme(colorScheme = colorScheme) {
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = MaterialTheme.colorScheme.background,
+            ) {
+                Box(Modifier.fillMaxSize()) {
+                    AnimatedContent(
             targetState = loadState,
             transitionSpec = {
                 fadeIn() togetherWith fadeOut()
@@ -168,6 +210,16 @@ fun App() {
                             }
                         }
                     }
+                }
+            }
+        }
+
+                // Floating dark-mode toggle – visible on every screen
+                ThemeToggleButton(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(16.dp),
+                )
                 }
             }
         }
